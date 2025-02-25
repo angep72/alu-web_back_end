@@ -1,45 +1,44 @@
 #!/usr/bin/env python3
-""" Basic Babel setup """
+"""
+Route module for the API
+"""
 from flask import Flask, render_template, request
-from flask_babel import Babel, _
+from os import getenv
+from flask_babel import Babel
 
 
-class Config(object):
-    """ Configuration Babel """
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
+app = Flask(__name__)
+
+
+class Config:
+    """ class config"""
+    LANGUAGES = ['en', 'fr']
     BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
 
 
-app = Flask(__name__, template_folder='templates')
 app.config.from_object(Config)
 babel = Babel(app)
 
 
 @babel.localeselector
 def get_locale():
-    """ Locale language
-
-        Return:
-            Best match to the language
-    """
-    locale = request.args.get('locale', None)
-
-    if locale and locale in app.config['LANGUAGES']:
-        return locale
-
-    return request.accept_languages.best_match(app.config['LANGUAGES'])
+    """best match locale lang"""
+    local_lang = request.args.get('locale')
+    support_lang = app.config['LANGUAGES']
+    if local_lang in support_lang:
+        return local_lang
+    else:
+        return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-@app.route('/', methods=['GET'], strict_slashes=False)
-def hello_world():
-    """ Greeting
-
-        Return:
-            Initial template html
-    """
-    return render_template('4-index.html')
+@app.route('/')
+def index():
+    """hello world"""
+    return render_template("4-index.html", message="Welcome to Holberton")
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    host = getenv("API_HOST", "0.0.0.0")
+    port = getenv("API_PORT", "5000")
+    app.run(host=host, port=port)

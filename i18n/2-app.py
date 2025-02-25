@@ -1,40 +1,39 @@
 #!/usr/bin/env python3
-""" Basic Babel setup """
+"""
+0x0A. i18n
+"""
+from os import getenv
 from flask import Flask, render_template, request
 from flask_babel import Babel
 
 
-class Config(object):
-    """ Configuration Babel """
-    LANGUAGES = ["en", "fr"]
-    BABEL_DEFAULT_TIMEZONE = 'UTC'
-    BABEL_DEFAULT_LOCALE = 'en'
-
-
 app = Flask(__name__)
-app.config.from_object(Config)
 babel = Babel(app)
+
+
+class Config(object):
+    """class config"""
+    LANGUAGES = ['en', 'fr']
+    BABEL_DEFAULT_LOCALE = 'en'
+    BABEL_DEFAULT_TIMEZONE = 'UTC'
+
+
+app.config.from_object(Config)
 
 
 @babel.localeselector
 def get_locale():
-    """ Locale language
-
-        Return:
-            Best match to the language
-    """
+    """get the locale"""
     return request.accept_languages.best_match(app.config['LANGUAGES'])
 
 
-@app.route('/', strict_slashes=False)
-def hello_world():
-    """ Greeting
-
-        Return:
-            Initial template html
-    """
-    return render_template('1-index.html')
+@app.route('/')
+def index():
+    """hello world"""
+    return render_template("1-index.html", message="Welcome to Holberton")
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port="5000")
+    host = getenv("API_HOST", "0.0.0.0")
+    port = getenv("API_PORT", "5000")
+    app.run(host=host, port=port)
